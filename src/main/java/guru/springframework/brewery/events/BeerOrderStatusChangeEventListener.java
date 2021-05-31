@@ -28,11 +28,15 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Component
+// if I have an order status change> I do a web hook callback> 
+// simple>just send a post request to your URL 
 public class BeerOrderStatusChangeEventListener {
 
+    //Spring manages the RestTemplate 
     RestTemplate restTemplate;
     DateMapper dateMapper = new DateMapper();
 
+    // I'm injecting in a RestTemplateBuilder
     public BeerOrderStatusChangeEventListener(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
     }
@@ -43,6 +47,9 @@ public class BeerOrderStatusChangeEventListener {
         System.out.println("I got an order status change event");
         System.out.println(event);
 
+        // implemented the OrderStatusUpdate event>
+        // I get the order + I'm basically doing a type conversion here 
+        // - I'm using the builder pattern to create a OrderStatusUpdate object
         OrderStatusUpdate update = OrderStatusUpdate.builder()
                 .id(event.getBeerOrder().getId())
                 .orderId(event.getBeerOrder().getId())
@@ -53,10 +60,14 @@ public class BeerOrderStatusChangeEventListener {
                 .customerRef(event.getBeerOrder().getCustomerRef())
                 .build();
 
+        // The 1st property I'm passing into postForObject is the callback URL which the event should have, 
+        // the request is the OrderStatusUpdate object > that's the response I'm expecting back. 
+        // Basic - a good response comes back.
         try{
             log.debug("Posting to callback url");
             restTemplate.postForObject(event.getBeerOrder().getOrderStatusCallbackUrl(), update, String.class);
         } catch (Throwable t){
+            // if I get a non 200 response back from the call, then RestTemplate throws an exception 
             log.error("Error Preforming callback for order: " + event.getBeerOrder().getId(), t);
         }
     }

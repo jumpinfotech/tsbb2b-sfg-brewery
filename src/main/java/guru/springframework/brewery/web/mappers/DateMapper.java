@@ -29,6 +29,9 @@ import java.time.ZoneOffset;
 @Component
 public class DateMapper {
 
+    // methods made public>convenient for type conversion from timestamp > 
+    // we are putting timestamps in a relational database
+    // + are using OffsetDateTime to send them across the wire.
     public OffsetDateTime asOffsetDateTime(Timestamp ts){
         if (ts != null){
             return OffsetDateTime.of(ts.toLocalDateTime().getYear(), ts.toLocalDateTime().getMonthValue(),

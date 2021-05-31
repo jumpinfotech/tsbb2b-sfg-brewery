@@ -40,6 +40,7 @@ public class OrderStatusUpdate extends BaseItem {
     }
 
     private UUID orderId;
+    // added customerRef property
     private String customerRef;
     private String orderStatus;
 }
